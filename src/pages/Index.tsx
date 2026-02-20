@@ -106,14 +106,21 @@ export default function Index() {
               </div>
               <Button onClick={handleSearch} className="bg-gradient-hero hover:opacity-90">Search</Button>
             </div>
-            <div className="mt-6 flex justify-center gap-3 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-              <Button variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10" asChild>
-                <Link to="/post?type=lost">I Lost Something</Link>
-              </Button>
-              <Button variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10" asChild>
-                <Link to="/post?type=found">I Found Something</Link>
-              </Button>
-            </div>
+           <div className="mt-6 flex justify-center gap-3 animate-fade-in" style={{ animationDelay: "0.3s" }}>
+  <Button
+    className="bg-black text-white hover:bg-gray-800 border-0"
+    asChild
+  >
+    <Link to="/post?type=lost">I Lost Something</Link>
+  </Button>
+
+  <Button
+    className="bg-black text-white hover:bg-gray-800 border-0"
+    asChild
+  >
+    <Link to="/post?type=found">I Found Something</Link>
+  </Button>
+</div>
           </div>
         </div>
       </section>
