@@ -1,73 +1,42 @@
-# Welcome to your Lovable project
+# SFIT Lost & Found
 
-## Project info
+**Official Lost and Found Portal for St. Francis Institute of Technology (SFIT), Borivali**
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+A web application built for the students, faculty, and staff of **St. Francis Institute of Technology (Autonomous)**, Borivali, Mumbai, to report, find, and reclaim lost items on campus.
 
-## How can I edit this code?
+## About the Project
 
-There are several ways of editing your application.
+This platform helps the SFIT community:
+- Report items that have been **lost** or **found**
+- Browse listings with filters (category, location, date, etc.)
+- Upload photos of items
+- Contact finders/owners securely via the platform
+- Reduce waste and promote community help
 
-**Use Lovable**
+Built with love by SFIT student(s) to make campus life a little easier.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+**College**: St. Francis Institute of Technology (SFIT)  
+**Location**: Mount Poinsur, S.V.P. Road, Borivali (West), Mumbai – 400103  
+**Official College Website**: [https://www.sfit.ac.in/](https://www.sfit.ac.in/)
 
-Changes made via Lovable will be committed automatically to this repo.
+## Technologies Used
 
-**Use your preferred IDE**
+- **Frontend**: React + TypeScript + Vite
+- **Styling**: Tailwind CSS + shadcn/ui components
+- **Backend & Database**: Supabase (PostgreSQL + Authentication + Storage)
+- **Other**: Supabase Realtime (for notifications), modern auth (PKCE flow)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## How to Run Locally
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Prerequisites
+- Node.js (v18+ recommended) and npm
+- Git
+- A Supabase project (free tier is fine)
 
-Follow these steps:
+### Setup Steps
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+1. **Clone the repository**
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+   ```bash
+   git clone https://github.com/YOUR-USERNAME/sfit-lost-found.git
+   cd sfit-lost-found
