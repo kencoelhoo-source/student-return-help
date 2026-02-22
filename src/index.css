@@ -1,8 +1,11 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Playfair+Display:wght@700;800;900&display=swap');
 
 @theme {
-  --font-body: "Inter", system-ui, sans-serif;
+  --font-family-body: 'DM Sans', system-ui, sans-serif;
+  --font-family-display: 'Playfair Display', serif;
 }
+
 @layer base {
   :root {
     --background: 40 33% 98%;
@@ -56,9 +59,6 @@
     --gradient-warm: linear-gradient(135deg, hsl(32, 95%, 55%) 0%, hsl(20, 90%, 50%) 100%);
     --gradient-overlay: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.7) 100%);
 
-    --font-display: 'Playfair Display', serif;
-    --font-body: 'DM Sans', sans-serif;
-
     --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
     --shadow-card-hover: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.06);
     --shadow-hero: 0 20px 60px -15px rgba(0, 0, 0, 0.2);
@@ -105,7 +105,7 @@
   }
 
   h1, h2, h3 {
-    font-family: var(--font-display);
+    @apply font-display;
   }
 }
 
