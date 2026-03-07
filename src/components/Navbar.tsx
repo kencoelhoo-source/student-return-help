@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, Bell, Menu, X, LogOut, LayoutDashboard, User } from "lucide-react";
+import { Search, Plus, Bell, Menu, X, LogOut, User } from "lucide-react";
 import { useState } from "react";
 import {
   DropdownMenu,
@@ -35,6 +35,9 @@ export function Navbar() {
           </Button>
           {user ? (
             <>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/dashboard">Dashboard</Link>
+              </Button>
               <Button size="sm" asChild>
                 <Link to="/post">
                   <Plus className="mr-1 h-4 w-4" /> Report Item
@@ -52,10 +55,6 @@ export function Navbar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => navigate("/dashboard")}>
-                    <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => signOut()}>
                     <LogOut className="mr-2 h-4 w-4" /> Sign Out
                   </DropdownMenuItem>
