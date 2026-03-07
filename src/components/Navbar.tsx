@@ -31,6 +31,9 @@ export function Navbar() {
         {/* Desktop nav */}
         <div className="hidden items-center gap-2 md:flex">
           <Button variant="ghost" size="sm" asChild>
+            <Link to="/">Home</Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild>
             <Link to="/items">Browse Items</Link>
           </Button>
           {user ? (
@@ -78,6 +81,9 @@ export function Navbar() {
       {mobileOpen && (
         <div className="border-t bg-card p-4 md:hidden animate-fade-in">
           <div className="flex flex-col gap-2">
+            <Button variant="ghost" asChild onClick={() => setMobileOpen(false)}>
+              <Link to="/">Home</Link>
+            </Button>
             <Button variant="ghost" asChild onClick={() => setMobileOpen(false)}>
               <Link to="/items">Browse Items</Link>
             </Button>
