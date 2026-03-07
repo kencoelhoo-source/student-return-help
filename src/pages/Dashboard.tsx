@@ -63,13 +63,25 @@ export default function Dashboard() {
       supabase.from("items").select("*").eq("user_id", user!.id).order("created_at", { ascending: false }),
       supabase.from("claims").select("*, items(title, status)").eq("user_id", user!.id).order("created_at", { ascending: false }),
       supabase.from("notifications").select("*").eq("user_id", user!.id).order("created_at", { ascending: false }),
-      supabase.from("claims").select("*, items!inner(title, user_id), profiles!claims_user_id_fkey(full_name)").eq("items.user_id", user!.id).order("created_at", { ascending: false }),
+      supabase.from("claims").select("*, items!inner(title, user_id)").eq("items.user_id", user!.id).order("created_at", { ascending: false }),
     ]);
 
     setMyItems((itemsRes.data as unknown as DBItem[]) || []);
     setMyClaims((claimsRes.data as unknown as DBClaim[]) || []);
     setNotifications((notifsRes.data as unknown as DBNotification[]) || []);
-    setIncomingClaims((incomingRes.data as unknown as DBClaim[]) || []);
+
+    const incClaims = (incomingRes.data as unknown as DBClaim[]) || [];
+    if (incClaims.length > 0) {
+      const userIds = incClaims.map(c => c.user_id);
+      const { data: profs } = await supabase.from("profiles").select("user_id, full_name").in("user_id", userIds);
+      if (profs) {
+        incClaims.forEach(c => {
+          const p = profs.find(p => p.user_id === c.user_id);
+          if (p) c.profiles = { full_name: p.full_name };
+        });
+      }
+    }
+    setIncomingClaims(incClaims);
     setLoading(false);
   };
 
