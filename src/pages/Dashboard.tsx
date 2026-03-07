@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, Navigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -130,7 +130,7 @@ export default function Dashboard() {
     fetchAll();
   };
 
-  if (!user) return null;
+  if (!user) return <Navigate to="/" replace />;
 
   return (
     <div className="container py-8">
