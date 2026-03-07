@@ -24,6 +24,11 @@ interface DBClaim {
   item_id: string;
   message: string;
   status: string;
+  verification_question: string | null;
+  verification_answer: string | null;
+  meeting_requested: boolean;
+  meeting_details: string | null;
+  appeal_message: string | null;
   items?: { title: string; user_id?: string; status?: string };
   profiles?: { full_name: string } | null;
 }
@@ -88,6 +93,20 @@ export default function Dashboard() {
     fetchAll();
   };
 
+  const handleAction = async (table: string, id: string, payload: any, successMsg: string, notifUserId?: string, notifMsg?: string) => {
+    await supabase.from(table).update(payload).eq("id", id);
+    if (notifUserId && notifMsg) {
+      await supabase.from("notifications").insert({
+        user_id: notifUserId,
+        title: "Claim Update",
+        message: notifMsg,
+        related_claim_id: table === "claims" ? id : null,
+      });
+    }
+    toast.success(successMsg);
+    fetchAll();
+  };
+
   if (!user) return null;
 
   return (
@@ -138,9 +157,77 @@ export default function Dashboard() {
           ) : myClaims.map((claim) => (
             <Card key={claim.id}>
               <CardContent className="p-4">
-                <p className="font-semibold">{claim.items?.title || "Item"}</p>
-                <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{claim.message}</p>
-                <Badge variant="secondary" className="mt-2 capitalize">{claim.status}</Badge>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-semibold">{claim.items?.title || "Item"}</p>
+                    <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{claim.message}</p>
+                  </div>
+                  <Badge variant="secondary" className="capitalize">{claim.status}</Badge>
+                </div>
+
+                {/* Verification Answer Flow */}
+                {claim.status === "pending" && claim.verification_question && !claim.verification_answer && !claim.meeting_requested && (
+                  <div className="mt-4 rounded-md bg-muted p-3">
+                    <p className="text-sm font-medium">Reporter's Question:</p>
+                    <p className="text-sm mt-1">"{claim.verification_question}"</p>
+                    <div className="mt-3">
+                      <form onSubmit={(e) => {
+                        e.preventDefault();
+                        const answer = new FormData(e.currentTarget).get("answer") as string;
+                        if (!answer.trim()) return;
+                        handleAction("claims", claim.id, { verification_answer: answer }, "Answer submitted", claim.items?.user_id, "The claimant answered your verification question.");
+                      }}>
+                        <textarea name="answer" placeholder="Your answer..." className="w-full text-sm rounded-md border bg-background p-2" rows={2} required />
+                        <div className="flex gap-2 mt-2">
+                          <Button size="sm" type="submit">Submit Answer</Button>
+                          <Button size="sm" variant="outline" type="button" onClick={() => handleAction("claims", claim.id, { meeting_requested: true }, "Meeting requested", claim.items?.user_id, "The claimant wants to meet in person to verify.")}>
+                            Request to Meet in Person instead
+                          </Button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                )}
+
+                {/* Waiting for reporter meeting details */}
+                {claim.meeting_requested && !claim.meeting_details && (
+                  <div className="mt-4 rounded-md border p-3 border-amber-200 bg-amber-50">
+                    <p className="text-sm text-amber-800">You requested to meet in person. Waiting for the reporter to suggest a time and place.</p>
+                  </div>
+                )}
+
+                {/* Showing meeting details */}
+                {claim.meeting_requested && claim.meeting_details && (
+                  <div className="mt-4 rounded-md bg-muted p-3">
+                    <p className="text-sm font-medium">Meeting Details from Reporter:</p>
+                    <p className="text-sm mt-1 whitespace-pre-wrap">{claim.meeting_details}</p>
+                  </div>
+                )}
+
+                {/* Appeal Flow */}
+                {claim.status === "rejected" && !claim.appeal_message && (
+                  <div className="mt-4">
+                    <p className="text-sm text-destructive mb-2">Claim was rejected. You can appeal by providing more details.</p>
+                    <form onSubmit={(e) => {
+                        e.preventDefault();
+                        const appeal = new FormData(e.currentTarget).get("appeal") as string;
+                        if (!appeal.trim()) return;
+                        // For simplicity without changing ENUM, we set status back to pending to trigger re-review
+                        handleAction("claims", claim.id, { appeal_message: appeal, status: "pending" }, "Appeal submitted", claim.items?.user_id, "The claimant has submitted an appeal with more details.");
+                    }}>
+                      <textarea name="appeal" placeholder="Describe in detail where you lost it, defining features, etc." className="w-full text-sm rounded-md border bg-background p-2" rows={3} required />
+                      <Button size="sm" type="submit" className="mt-2 w-full">Submit Appeal</Button>
+                    </form>
+                  </div>
+                )}
+
+                {claim.appeal_message && claim.status === "pending" && (
+                   <div className="mt-4 rounded-md bg-muted p-3">
+                     <p className="text-sm font-medium">Your Appeal:</p>
+                     <p className="text-sm mt-1">"{claim.appeal_message}"</p>
+                     <p className="text-xs text-muted-foreground mt-2">Waiting for reporter to re-review.</p>
+                   </div>
+                )}
               </CardContent>
             </Card>
           ))}
@@ -152,16 +239,103 @@ export default function Dashboard() {
           ) : incomingClaims.map((claim) => (
             <Card key={claim.id}>
               <CardContent className="p-4">
-                <p className="font-semibold">Claim on: {claim.items?.title}</p>
-                <p className="mt-1 text-sm text-muted-foreground">By: {claim.profiles?.full_name || "Anonymous"}</p>
-                <p className="mt-1 text-sm italic">"{claim.message}"</p>
-                {claim.status === "pending" && (
-                  <div className="mt-3 flex gap-2">
-                    <Button size="sm" onClick={() => updateClaimStatus(claim.id, "approved", claim.item_id)}>Approve</Button>
-                    <Button size="sm" variant="outline" onClick={() => updateClaimStatus(claim.id, "rejected", claim.item_id)}>Reject</Button>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-semibold">Claim on: {claim.items?.title}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">By: {claim.profiles?.full_name || "Anonymous"}</p>
+                  </div>
+                  {claim.status !== "pending" && <Badge variant="secondary" className="capitalize">{claim.status}</Badge>}
+                </div>
+                
+                <p className="mt-4 text-sm italic">"{claim.message}"</p>
+
+                {/* Initial pending actions */}
+                {claim.status === "pending" && !claim.verification_question && !claim.appeal_message && (
+                  <div className="mt-4">
+                    <form onSubmit={(e) => {
+                      e.preventDefault();
+                      const question = new FormData(e.currentTarget).get("question") as string;
+                      if (!question.trim()) return;
+                      handleAction("claims", claim.id, { verification_question: question }, "Question sent", claim.user_id, "The reporter has a verification question for you.");
+                    }}>
+                      <p className="text-sm font-medium mb-1">Verify Ownership (Optional)</p>
+                      <div className="flex gap-2">
+                        <input name="question" placeholder="e.g., What is the lock screen wallpaper?" className="flex-1 text-sm rounded-md border px-3 py-1" required />
+                        <Button size="sm" type="submit" variant="secondary">Ask Question</Button>
+                      </div>
+                    </form>
+                    
+                    <div className="mt-4 pt-4 border-t flex gap-2">
+                      <Button size="sm" onClick={() => updateClaimStatus(claim.id, "approved", claim.item_id)}>Approve Claim</Button>
+                      <Button size="sm" variant="outline" onClick={() => updateClaimStatus(claim.id, "rejected", claim.item_id)}>Reject</Button>
+                    </div>
                   </div>
                 )}
-                {claim.status !== "pending" && <Badge variant="secondary" className="mt-2 capitalize">{claim.status}</Badge>}
+
+                {/* Waiting on claimer to answer */}
+                {claim.status === "pending" && claim.verification_question && !claim.verification_answer && !claim.meeting_requested && (
+                  <div className="mt-4 rounded-md border p-3 border-blue-200 bg-blue-50">
+                    <p className="text-sm text-blue-800">You asked Verification Question: "{claim.verification_question}"</p>
+                    <p className="text-xs text-blue-600 mt-1">Waiting for claimant to answer...</p>
+                  </div>
+                )}
+
+                {/* Claimant answered the question */}
+                {claim.status === "pending" && claim.verification_question && claim.verification_answer && (
+                  <div className="mt-4 rounded-md bg-muted p-3">
+                    <p className="text-sm font-medium">Verification Result</p>
+                    <p className="text-sm mt-2 text-muted-foreground">Your Q: {claim.verification_question}</p>
+                    <p className="text-sm font-semibold mt-1">Their A: {claim.verification_answer}</p>
+                    <div className="mt-3 flex gap-2">
+                      <Button size="sm" onClick={() => updateClaimStatus(claim.id, "approved", claim.item_id)}>Approve</Button>
+                      <Button size="sm" variant="outline" onClick={() => updateClaimStatus(claim.id, "rejected", claim.item_id)}>Reject</Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Claimant requested a meeting */}
+                {claim.status === "pending" && claim.meeting_requested && !claim.meeting_details && (
+                  <div className="mt-4 rounded-md border p-3 border-amber-200 bg-amber-50">
+                    <p className="text-sm font-medium text-amber-800">Claimant wants to meet in person</p>
+                    <form className="mt-2" onSubmit={(e) => {
+                      e.preventDefault();
+                      const details = new FormData(e.currentTarget).get("details") as string;
+                      if (!details.trim()) return;
+                      handleAction("claims", claim.id, { meeting_details: details }, "Meeting details sent", claim.user_id, "The reporter sent meeting details.");
+                    }}>
+                      <textarea name="details" placeholder="Where and when? e.g., Library cafe at 3 PM today." className="w-full text-sm rounded-md border bg-background p-2" rows={2} required />
+                      <div className="mt-2 flex gap-2">
+                        <Button size="sm" type="submit">Send Details</Button>
+                        <Button size="sm" variant="outline" type="button" onClick={() => updateClaimStatus(claim.id, "rejected", claim.item_id)}>Reject Claim</Button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+
+                {/* Meeting details sent wait */}
+                {claim.meeting_requested && claim.meeting_details && claim.status === "pending" && (
+                   <div className="mt-4 rounded-md bg-muted p-3">
+                     <p className="text-sm font-medium">Meeting Setup</p>
+                     <p className="text-sm mt-1">You suggested: {claim.meeting_details}</p>
+                     <div className="mt-3 flex gap-2">
+                      <Button size="sm" onClick={() => updateClaimStatus(claim.id, "approved", claim.item_id)}>Mark as Returned (Approve)</Button>
+                     </div>
+                   </div>
+                )}
+
+                {/* Handling Appeals */}
+                {claim.status === "pending" && claim.appeal_message && (
+                  <div className="mt-4 rounded-md border border-red-200 bg-red-50 p-3">
+                    <p className="text-sm font-bold text-red-800">Appeal from Claimant</p>
+                    <p className="text-sm mt-2">"{claim.appeal_message}"</p>
+                    <div className="mt-3 flex gap-2">
+                      <Button size="sm" onClick={() => updateClaimStatus(claim.id, "approved", claim.item_id)}>Approve Appeal</Button>
+                      <Button size="sm" variant="outline" onClick={() => {
+                        handleAction("claims", claim.id, { status: "rejected" }, "Appeal rejected", claim.user_id, "Your appeal was rejected.");
+                      }}>Reject Again</Button>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}

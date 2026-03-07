@@ -22,6 +22,11 @@ export type Database = {
           message: string
           status: Database["public"]["Enums"]["claim_status"]
           user_id: string
+          verification_question: string | null
+          verification_answer: string | null
+          meeting_requested: boolean
+          meeting_details: string | null
+          appeal_message: string | null
         }
         Insert: {
           created_at?: string
@@ -30,6 +35,11 @@ export type Database = {
           message: string
           status?: Database["public"]["Enums"]["claim_status"]
           user_id: string
+          verification_question?: string | null
+          verification_answer?: string | null
+          meeting_requested?: boolean
+          meeting_details?: string | null
+          appeal_message?: string | null
         }
         Update: {
           created_at?: string
@@ -38,6 +48,11 @@ export type Database = {
           message?: string
           status?: Database["public"]["Enums"]["claim_status"]
           user_id?: string
+          verification_question?: string | null
+          verification_answer?: string | null
+          meeting_requested?: boolean
+          meeting_details?: string | null
+          appeal_message?: string | null
         }
         Relationships: [
           {
