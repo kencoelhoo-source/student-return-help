@@ -22,6 +22,7 @@ interface DBItem {
 interface DBClaim {
   id: string;
   item_id: string;
+  user_id: string;
   message: string;
   status: string;
   verification_question: string | null;
@@ -61,7 +62,7 @@ export default function Dashboard() {
     setLoading(true);
     const [itemsRes, claimsRes, notifsRes, incomingRes] = await Promise.all([
       supabase.from("items").select("*").eq("user_id", user!.id).order("created_at", { ascending: false }),
-      supabase.from("claims").select("*, items(title, status)").eq("user_id", user!.id).order("created_at", { ascending: false }),
+      supabase.from("claims").select("*, items(title, status, user_id)").eq("user_id", user!.id).order("created_at", { ascending: false }),
       supabase.from("notifications").select("*").eq("user_id", user!.id).order("created_at", { ascending: false }),
       supabase.from("claims").select("*, items!inner(title, user_id)").eq("items.user_id", user!.id).order("created_at", { ascending: false }),
     ]);
@@ -105,8 +106,8 @@ export default function Dashboard() {
     fetchAll();
   };
 
-  const handleAction = async (table: string, id: string, payload: any, successMsg: string, notifUserId?: string, notifMsg?: string) => {
-    await supabase.from(table).update(payload).eq("id", id);
+  const handleAction = async (table: "claims" | "notifications" | "items", id: string, payload: any, successMsg: string, notifUserId?: string, notifMsg?: string) => {
+    await supabase.from(table).update(payload as any).eq("id", id);
     if (notifUserId && notifMsg) {
       await supabase.from("notifications").insert({
         user_id: notifUserId,
