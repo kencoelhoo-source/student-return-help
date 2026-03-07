@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Linting output files
+lint-errors.txt
+lint-out.txt
+lint-results.json
+ts-errors.txt
