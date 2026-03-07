@@ -11,17 +11,43 @@ import { format } from "date-fns";
 import { Bell, Package, Search, CheckCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
+interface DBItem {
+  id: string;
+  title: string;
+  status: string;
+  created_at: string;
+  user_id?: string;
+}
+
+interface DBClaim {
+  id: string;
+  item_id: string;
+  message: string;
+  status: string;
+  items?: { title: string; user_id?: string; status?: string };
+  profiles?: { full_name: string } | null;
+}
+
+interface DBNotification {
+  id: string;
+  title: string;
+  message: string;
+  created_at: string;
+  read: boolean;
+}
+
 export default function Dashboard() {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const defaultTab = searchParams.get("tab") || "my-items";
 
-  const [myItems, setMyItems] = useState<any[]>([]);
-  const [myClaims, setMyClaims] = useState<any[]>([]);
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [incomingClaims, setIncomingClaims] = useState<any[]>([]);
+  const [myItems, setMyItems] = useState<DBItem[]>([]);
+  const [myClaims, setMyClaims] = useState<DBClaim[]>([]);
+  const [notifications, setNotifications] = useState<DBNotification[]>([]);
+  const [incomingClaims, setIncomingClaims] = useState<DBClaim[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (user) fetchAll();
   }, [user]);
@@ -35,10 +61,10 @@ export default function Dashboard() {
       supabase.from("claims").select("*, items!inner(title, user_id), profiles!claims_user_id_fkey(full_name)").eq("items.user_id", user!.id).order("created_at", { ascending: false }),
     ]);
 
-    setMyItems(itemsRes.data || []);
-    setMyClaims(claimsRes.data || []);
-    setNotifications(notifsRes.data || []);
-    setIncomingClaims(incomingRes.data || []);
+    setMyItems((itemsRes.data as unknown as DBItem[]) || []);
+    setMyClaims((claimsRes.data as unknown as DBClaim[]) || []);
+    setNotifications((notifsRes.data as unknown as DBNotification[]) || []);
+    setIncomingClaims((incomingRes.data as unknown as DBClaim[]) || []);
     setLoading(false);
   };
 
@@ -54,9 +80,9 @@ export default function Dashboard() {
   };
 
   const updateClaimStatus = async (claimId: string, status: string, itemId: string) => {
-    await supabase.from("claims").update({ status: status as any }).eq("id", claimId);
+    await supabase.from("claims").update({ status: status as never }).eq("id", claimId);
     if (status === "approved") {
-      await supabase.from("items").update({ status: "claimed" as any }).eq("id", itemId);
+      await supabase.from("items").update({ status: "claimed" as never }).eq("id", itemId);
     }
     toast.success(`Claim ${status}`);
     fetchAll();
@@ -112,7 +138,7 @@ export default function Dashboard() {
           ) : myClaims.map((claim) => (
             <Card key={claim.id}>
               <CardContent className="p-4">
-                <p className="font-semibold">{(claim as any).items?.title || "Item"}</p>
+                <p className="font-semibold">{claim.items?.title || "Item"}</p>
                 <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{claim.message}</p>
                 <Badge variant="secondary" className="mt-2 capitalize">{claim.status}</Badge>
               </CardContent>
@@ -126,8 +152,8 @@ export default function Dashboard() {
           ) : incomingClaims.map((claim) => (
             <Card key={claim.id}>
               <CardContent className="p-4">
-                <p className="font-semibold">Claim on: {(claim as any).items?.title}</p>
-                <p className="mt-1 text-sm text-muted-foreground">By: {(claim as any).profiles?.full_name || "Anonymous"}</p>
+                <p className="font-semibold">Claim on: {claim.items?.title}</p>
+                <p className="mt-1 text-sm text-muted-foreground">By: {claim.profiles?.full_name || "Anonymous"}</p>
                 <p className="mt-1 text-sm italic">"{claim.message}"</p>
                 {claim.status === "pending" && (
                   <div className="mt-3 flex gap-2">

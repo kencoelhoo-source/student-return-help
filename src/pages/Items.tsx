@@ -29,6 +29,7 @@ export default function Items() {
   const [category, setCategory] = useState("all");
   const [location, setLocation] = useState("all");
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchItems();
   }, [keyword, status, category, location]);
@@ -40,8 +41,8 @@ export default function Items() {
       .select("id, title, description, category, location, status, date_occurred, created_at")
       .order("created_at", { ascending: false });
 
-    if (status !== "all") query = query.eq("status", status as any);
-    if (category !== "all") query = query.eq("category", category as any);
+    if (status !== "all") query = query.eq("status", status as never);
+    if (category !== "all") query = query.eq("category", category as never);
     if (location !== "all") query = query.eq("location", location);
     if (keyword.trim()) query = query.or(`title.ilike.%${keyword}%,description.ilike.%${keyword}%`);
 

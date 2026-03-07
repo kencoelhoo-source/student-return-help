@@ -44,8 +44,8 @@ export function ClaimModal({ open, onOpenChange, itemId, itemTitle, itemOwnerId,
       setMessage("");
       onOpenChange(false);
       onClaimed();
-    } catch (err: any) {
-      toast.error(err.message || "Failed to submit claim");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to submit claim");
     } finally {
       setLoading(false);
     }

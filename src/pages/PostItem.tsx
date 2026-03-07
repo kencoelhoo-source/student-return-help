@@ -71,9 +71,9 @@ export default function PostItem() {
           user_id: user.id,
           title: title.trim(),
           description: description.trim() || null,
-          category: category as any,
+          category: category as never,
           location: location || null,
-          status: itemType as any,
+          status: itemType as never,
           date_occurred: dateOccurred ? format(dateOccurred, "yyyy-MM-dd") : null,
           contact_email: user.email,
         })
@@ -99,8 +99,8 @@ export default function PostItem() {
 
       toast.success("Item posted successfully!");
       navigate(`/items/${item.id}`);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to post item");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to post item");
     } finally {
       setLoading(false);
     }

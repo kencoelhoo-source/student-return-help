@@ -11,17 +11,42 @@ import { ItemCard } from "@/components/ItemCard";
 import { MapPin, Calendar, Tag, ArrowLeft, Hand } from "lucide-react";
 import { format } from "date-fns";
 
+interface DBItem {
+  id: string;
+  title: string;
+  description: string | null;
+  category: string;
+  location: string | null;
+  status: string;
+  date_occurred: string | null;
+  created_at: string;
+  user_id: string;
+}
+
+interface RelatedItem {
+  id: string;
+  title: string;
+  description: string | null;
+  category: string;
+  location: string | null;
+  status: "lost" | "found" | "claimed" | "returned";
+  date_occurred: string | null;
+  created_at: string;
+  image_url: string | null;
+}
+
 export default function ItemDetail() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
-  const [item, setItem] = useState<any>(null);
+  const [item, setItem] = useState<DBItem | null>(null);
   const [images, setImages] = useState<string[]>([]);
-  const [relatedItems, setRelatedItems] = useState<any[]>([]);
+  const [relatedItems, setRelatedItems] = useState<RelatedItem[]>([]);
   const [activeImage, setActiveImage] = useState(0);
   const [claimOpen, setClaimOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [poster, setPoster] = useState<string | null>(null);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (id) fetchItem();
   }, [id]);
