@@ -98,7 +98,11 @@ export default function Dashboard() {
   };
 
   const updateClaimStatus = async (claimId: string, status: string, itemId: string) => {
-    await supabase.from("claims").update({ status: status as never }).eq("id", claimId);
+    const { error } = await supabase.from("claims").update({ status: status as never }).eq("id", claimId);
+    if (error) {
+      toast.error(`Failed to update status: ${error.message}`);
+      return;
+    }
     if (status === "approved") {
       await supabase.from("items").update({ status: "claimed" as never }).eq("id", itemId);
     }
@@ -107,7 +111,13 @@ export default function Dashboard() {
   };
 
   const handleAction = async (table: "claims" | "notifications" | "items", id: string, payload: any, successMsg: string, notifUserId?: string, notifMsg?: string) => {
-    await supabase.from(table).update(payload as any).eq("id", id);
+    const { error } = await supabase.from(table).update(payload as any).eq("id", id);
+    if (error) {
+      console.error(error);
+      toast.error(`Error: ${error.message}`);
+      return;
+    }
+    
     if (notifUserId && notifMsg) {
       await supabase.from("notifications").insert({
         user_id: notifUserId,
