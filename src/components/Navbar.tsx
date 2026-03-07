@@ -84,6 +84,15 @@ export function Navbar() {
       {mobileOpen && (
         <div className="border-t bg-card p-4 md:hidden animate-fade-in">
           <div className="flex flex-col gap-2">
+            {user && (
+              <div className="mb-2 border-b pb-4 px-2">
+                <p className="text-sm font-medium text-foreground">
+                  {user.user_metadata?.full_name || "CampusFind User"}
+                </p>
+                <p className="text-xs text-muted-foreground">{user.email}</p>
+              </div>
+            )}
+            
             <Button variant="ghost" asChild onClick={() => setMobileOpen(false)}>
               <Link to="/">Home</Link>
             </Button>
