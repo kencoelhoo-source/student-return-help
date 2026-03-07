@@ -58,6 +58,9 @@ export function Navbar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <div className="px-2 py-1.5 text-sm font-medium text-muted-foreground border-b mb-1">
+                    {user.user_metadata?.full_name || user.email || "Logged in"}
+                  </div>
                   <DropdownMenuItem onClick={() => signOut()}>
                     <LogOut className="mr-2 h-4 w-4" /> Sign Out
                   </DropdownMenuItem>

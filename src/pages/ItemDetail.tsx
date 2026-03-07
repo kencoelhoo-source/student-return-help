@@ -146,7 +146,7 @@ export default function ItemDetail() {
                 <Hand className="h-4 w-4 text-primary" />
                 <div>
                   <p className="text-muted-foreground">Posted by</p>
-                  <p className="font-medium">{poster}</p>
+                  <p className="font-medium">{user?.id === item.user_id ? "You" : poster}</p>
                 </div>
               </div>
             </CardContent>

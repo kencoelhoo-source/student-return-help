@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { STATUS_COLORS } from "@/lib/constants";
+import { useAuth } from "@/lib/auth";
 
 interface ItemCardProps {
   id: string;
@@ -15,9 +16,12 @@ interface ItemCardProps {
   date_occurred: string | null;
   image_url?: string | null;
   created_at: string;
+  user_id?: string;
+  poster_name?: string;
 }
 
-export function ItemCard({ id, title, description, category, location, status, date_occurred, image_url, created_at }: ItemCardProps) {
+export function ItemCard({ id, title, description, category, location, status, date_occurred, image_url, created_at, user_id, poster_name }: ItemCardProps) {
+  const { user } = useAuth();
   const statusStyle = STATUS_COLORS[status];
 
   return (
@@ -36,13 +40,20 @@ export function ItemCard({ id, title, description, category, location, status, d
           </Badge>
         </div>
         <CardContent className="p-4">
-          <h3 className="font-display text-lg font-bold leading-tight text-foreground line-clamp-1">
-            {title}
-          </h3>
-          {description && (
-            <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{description}</p>
+          <div className="flex justify-between items-start gap-2">
+            <h3 className="font-display text-lg font-bold leading-tight text-foreground line-clamp-1">
+              {title}
+            </h3>
+          </div>
+          {poster_name && (
+            <p className="mt-1 text-xs font-medium text-primary">
+              Posted by {user?.id === user_id ? "You" : poster_name}
+            </p>
           )}
-          <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+          {description && (
+            <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{description}</p>
+          )}
+          <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
             {location && (
               <span className="flex items-center gap-1">
                 <MapPin className="h-3 w-3" /> {location}
