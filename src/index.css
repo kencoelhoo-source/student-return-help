@@ -1,13 +1,12 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Playfair+Display:wght@700;800;900&display=swap');
-
-@theme {
-  --font-family-body: 'DM Sans', system-ui, sans-serif;
-  --font-family-display: 'Playfair Display', serif;
-}
 
 @layer base {
   :root {
+    --font-family-body: 'DM Sans', system-ui, sans-serif;
+    --font-family-display: 'Playfair Display', serif;
     --background: 40 33% 98%;
     --foreground: 220 25% 10%;
 
