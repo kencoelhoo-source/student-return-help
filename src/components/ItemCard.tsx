@@ -26,7 +26,7 @@ export function ItemCard({ id, title, description, category, location, status, d
 
   return (
     <Link to={`/items/${id}`} className="group block">
-      <Card className="overflow-hidden transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1">
+      <Card className="overflow-hidden rounded-2xl border-0 shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-0.5">
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
           {image_url ? (
             <img src={image_url} alt={title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -35,25 +35,25 @@ export function ItemCard({ id, title, description, category, location, status, d
               <span className="text-4xl">📦</span>
             </div>
           )}
-          <Badge className={`absolute left-3 top-3 ${statusStyle.bg} ${statusStyle.text} border-0 font-semibold`}>
-            {statusStyle.label}
-          </Badge>
+          <div className="absolute left-3 top-3">
+            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${statusStyle.bg} ${statusStyle.text}`}>
+              {statusStyle.label}
+            </span>
+          </div>
         </div>
         <CardContent className="p-4">
-          <div className="flex justify-between items-start gap-2">
-            <h3 className="font-display text-lg font-bold leading-tight text-foreground line-clamp-1">
-              {title}
-            </h3>
-          </div>
+          <h3 className="text-[15px] font-semibold leading-tight text-foreground line-clamp-1">
+            {title}
+          </h3>
           {poster_name && (
-            <p className="mt-1 text-xs font-medium text-primary">
+            <p className="mt-1 text-[12px] font-medium text-primary">
               Posted by {user?.id === user_id ? "You" : poster_name}
             </p>
           )}
           {description && (
-            <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{description}</p>
+            <p className="mt-1.5 text-[13px] text-muted-foreground line-clamp-2 leading-relaxed">{description}</p>
           )}
-          <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
             {location && (
               <span className="flex items-center gap-1">
                 <MapPin className="h-3 w-3" /> {location}
@@ -64,9 +64,11 @@ export function ItemCard({ id, title, description, category, location, status, d
               {date_occurred ? format(new Date(date_occurred), "MMM d, yyyy") : format(new Date(created_at), "MMM d, yyyy")}
             </span>
           </div>
-          <Badge variant="secondary" className="mt-2 text-xs capitalize">
-            {category}
-          </Badge>
+          <div className="mt-2.5">
+            <span className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-[11px] font-medium text-secondary-foreground capitalize">
+              {category}
+            </span>
+          </div>
         </CardContent>
       </Card>
     </Link>
